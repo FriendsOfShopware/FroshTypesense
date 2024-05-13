@@ -24,4 +24,12 @@ Not yet.
 
 Not yet.
 
+## Development
+
+You can start a locker typesense server using docker compose
+
+```bash
+cd vendor/frosh/typesense
+docker-compose up -d
+```
 
