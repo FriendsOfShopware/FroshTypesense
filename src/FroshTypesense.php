@@ -10,5 +10,4 @@ class FroshTypesense extends Plugin
     {
         return true;
     }
-
 }

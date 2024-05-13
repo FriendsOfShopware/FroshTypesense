@@ -6,6 +6,6 @@
 
     <services>
         <defaults autowire="true" autoconfigure="true" />
-        <prototype namespace="Frosh\Typesense\" resource="../../" exclude="../../{FroshTypesense.php}" />
+        <prototype namespace="FroshTypesense\" resource="../../" exclude="../../{FroshTypesense.php}" />
     </services>
 </container>
