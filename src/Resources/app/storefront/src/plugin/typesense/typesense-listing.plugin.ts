@@ -48,13 +48,13 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
 
 
     init() {
-
         const {
             indexName,
             salesChannelId,
             apiKey,
             nodes,
             boxLayout,
+            priceField,
         } = this.options;
 
         const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter(
@@ -105,8 +105,8 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
                 container: '#sort-by',
                 items: [
                     {label: 'Relevancy', value: indexName},
-                    {label: 'Price (asc)', value: `${indexName}/sort/price:asc`},
-                    {label: 'Price (desc)', value: `${indexName}/sort/price:desc`},
+                    {label: 'Price (asc)', value: `${indexName}/sort/${priceField}:asc`},
+                    {label: 'Price (desc)', value: `${indexName}/sort/${priceField}:desc`},
                 ],
                 cssClasses: {
                     select: 'form-select',
