@@ -67,7 +67,7 @@ class ProductIndexer extends AbstractIndexer
                     'type' => 'int32',
                 ],
                 [
-                    'name' => 'price',
+                    'name' => 'price.*',
                     'type' => 'float',
                     'facet' => true
                 ],
@@ -117,6 +117,10 @@ class ProductIndexer extends AbstractIndexer
 
         $data = [];
         foreach ($products as $id => $product) {
+            if ($product['displayGroup'] === null) {
+                continue;
+            }
+
             $translations = $this->filterToOne(json_decode((string) $product['translation'], true, 512, \JSON_THROW_ON_ERROR));
             $parentTranslations = $this->filterToOne(json_decode((string) $product['translation_parent'], true, 512, \JSON_THROW_ON_ERROR));
             $categories = $this->filterToMany(json_decode((string) $product['categories'], true, 512, \JSON_THROW_ON_ERROR));
@@ -153,7 +157,9 @@ class ProductIndexer extends AbstractIndexer
 
             $paths = explode('|', $product['seoPathInfo']);
 
-            $data[] = [
+            $prices = json_decode($product['price'], true, 512, \JSON_THROW_ON_ERROR);
+
+            $row = [
                 'id' => $id,
                 'name' => self::stripText($this->takeItem('name', $context, $translations, $parentTranslations) ?? ''),
                 'description' => self::stripText($this->takeItem('description', $context, $translations, $parentTranslations) ?? ''),
@@ -172,8 +178,15 @@ class ProductIndexer extends AbstractIndexer
                 'imageWidth' => $coverWidth,
                 'imageHeight' => $coverHeight,
                 'childCount' => (int) $product['childCount'],
-                'url' => '/'. $paths[0] ?? ''
+                'url' => '/'. $paths[0] ?? '',
             ];
+
+            foreach ($prices as $price) {
+                $row['price_' . $price['currencyId'] . '_gross'] = $price['gross'];
+                $row['price_' . $price['currencyId'] . '_net'] = $price['net'];
+            }
+
+            $data[] = $row;
         }
 
         return $data;
@@ -260,6 +273,8 @@ SELECT
     ) as cover,
 
     GROUP_CONCAT(seo_url.seo_path_info SEPARATOR '|') as seoPathInfo,
+
+    IFNULL(p.price, pp.price) AS price,
 
     IFNULL(p.manufacturer_number, pp.manufacturer_number) AS manufacturerNumber,
     IFNULL(p.available_stock, pp.available_stock) AS availableStock,

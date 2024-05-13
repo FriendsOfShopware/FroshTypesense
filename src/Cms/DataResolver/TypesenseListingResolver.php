@@ -36,10 +36,13 @@ class TypesenseListingResolver extends AbstractCmsElementResolver
 
     public function enrich(CmsSlotEntity $slot, ResolverContext $resolverContext, ElementDataCollection $result): void
     {
+        $context = $resolverContext->getSalesChannelContext();
+
         $slot->setData(new ArrayStruct([
             'nodes' => ClientFactory::getNodes($this->urls),
             'apiKey' => $this->token,
-            'indexName' => 'product_' . $resolverContext->getSalesChannelContext()->getLanguageId(),
+            'indexName' => 'product_' . $context->getLanguageId(),
+            'priceField' => 'price_' . $context->getCurrencyId().'_' . $context->getTaxState(),
         ]));
     }
 }
