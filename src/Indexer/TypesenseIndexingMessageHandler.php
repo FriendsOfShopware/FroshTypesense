@@ -6,7 +6,6 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IteratorFactory;
-use Shopware\Elasticsearch\Framework\ElasticsearchLanguageProvider;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -21,9 +20,7 @@ class TypesenseIndexingMessageHandler
     public function __construct(
         private readonly Client $client,
         #[TaggedIterator('frosh_typesense.indexer')]
-        private readonly iterable $indexers,
-        private readonly IteratorFactory $iteratorFactory,
-        private readonly MessageBusInterface $messageBus,
+        private readonly iterable $indexers
     )
     {
     }
@@ -38,13 +35,25 @@ class TypesenseIndexingMessageHandler
         );
 
         foreach ($this->indexers as $indexer) {
-            if ($indexer->getName() !== $message->indexName) {
+            if ($indexer->getName() !== $message->entityName) {
                 continue;
             }
 
             $data = $indexer->fetch($message->ids, $context);
 
-            $this->client->collections[$message->indexName]->documents->import($data);
+            $results = $this->client->collections[$message->indexName]->documents->import($data, ['action' => 'upsert']);
+
+            $errors = [];
+
+            foreach ($results as $result) {
+                if (isset($result['error'])) {
+                    $errors[] = $result;
+                }
+            }
+
+            if (!empty($errors)) {
+                dd($errors);
+            }
         }
     }
 }

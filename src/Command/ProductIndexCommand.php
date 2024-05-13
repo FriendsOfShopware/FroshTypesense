@@ -4,6 +4,7 @@ namespace FroshTypesense\Command;
 
 use FroshTypesense\Indexer\AbstractIndexer;
 use FroshTypesense\Indexer\TypesenseIndexingMessage;
+use FroshTypesense\Indexer\TypesenseIndexingMessageHandler;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -13,6 +14,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -33,13 +35,25 @@ class ProductIndexCommand extends Command
         private readonly ElasticsearchLanguageProvider $languageProvider,
         private readonly IteratorFactory               $iteratorFactory,
         private readonly MessageBusInterface           $messageBus,
+        private readonly TypesenseIndexingMessageHandler $handler,
     )
     {
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->addOption('sync', null, InputOption::VALUE_NONE, 'Dont use Queue');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $collections = $this->client->collections->retrieve();
+
+        foreach ($collections as $collection) {
+            $this->client->collections[$collection['name']]->delete();
+        }
+
         $languages = $this->languageProvider->getLanguages(Context::createDefaultContext());
 
         $io = new SymfonyStyle($input, $output);
@@ -70,14 +84,19 @@ class ProductIndexCommand extends Command
                 $progressBar->start();
 
                 while ($ids = $iterator->fetch()) {
-                    $this->messageBus->dispatch(
-                        new TypesenseIndexingMessage(
-                            $indexer->getName(),
-                            $alias,
-                            $ids,
-                            $context->getLanguageIdChain(),
-                        )
+                    $msg = new TypesenseIndexingMessage(
+                        $indexer->getName(),
+                        $alias . '_' . $time,
+                        $ids,
+                        $context->getLanguageIdChain(),
                     );
+
+                    if ($input->getOption('sync')) {
+                        $x = $this->handler;
+                        $x($msg);
+                    } else {
+                        $this->messageBus->dispatch($msg);
+                    }
 
                     $progressBar->advance(count($ids));
                 }

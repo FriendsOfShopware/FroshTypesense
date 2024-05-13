@@ -10,6 +10,8 @@
 
         <service id="Typesense\Client">
             <factory class="FroshTypesense\DependencyInjection\ClientFactory" method="create"/>
+            <argument>%frosh_typesense.token%</argument>
+            <argument>%frosh_typesense.hosts%</argument>
         </service>
     </services>
 </container>
