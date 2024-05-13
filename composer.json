@@ -1,40 +1,41 @@
 {
-  "name": "frosh/typesense",
-  "description": "Typesense for Shopware",
-  "type": "shopware-platform-plugin",
-  "version": "1.0.0",
-  "authors": [
-    {
-      "name": "FriendsOfShopware"
-    }
-  ],
-  "require": {
-    "shopware/core": "~6.4"
-  },
-  "license": "MIT",
-  "autoload": {
-    "psr-4": {
-      "FroshTypesense\\": "src/"
-    }
-  },
-  "extra": {
-    "shopware-plugin-class": "FroshTypesense\\FroshTypesense",
-    "copyright": "FriendsOfShopware",
-    "label": {
-      "de-DE": "FroshTypesense",
-      "en-GB": "FroshTypesense"
+    "name": "frosh/typesense",
+    "description": "Typesense for Shopware",
+    "type": "shopware-platform-plugin",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "FriendsOfShopware"
+        }
+    ],
+    "require": {
+        "shopware/core": "~6.4",
+        "typesense/typesense-php": "~4.9.3"
     },
-    "description": {
-      "de-DE": "Typesense for Shopware",
-      "en-GB": "Typesense for Shopware"
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "FroshTypesense\\": "src/"
+        }
     },
-    "manufacturerLink": {
-      "de-DE": "https://acme.org",
-      "en-GB": "https://acme.org"
-    },
-    "supportLink": {
-      "de-DE": "https://acme.org",
-      "en-GB": "https://acme.org"
+    "extra": {
+        "shopware-plugin-class": "FroshTypesense\\FroshTypesense",
+        "copyright": "FriendsOfShopware",
+        "label": {
+            "de-DE": "FroshTypesense",
+            "en-GB": "FroshTypesense"
+        },
+        "description": {
+            "de-DE": "Typesense for Shopware",
+            "en-GB": "Typesense for Shopware"
+        },
+        "manufacturerLink": {
+            "de-DE": "https://acme.org",
+            "en-GB": "https://acme.org"
+        },
+        "supportLink": {
+            "de-DE": "https://acme.org",
+            "en-GB": "https://acme.org"
+        }
     }
-  }
 }

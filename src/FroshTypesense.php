@@ -6,4 +6,9 @@ use Shopware\Core\Framework\Plugin;
 
 class FroshTypesense extends Plugin
 {
+    public function executeComposerCommands(): bool
+    {
+        return true;
+    }
+
 }
