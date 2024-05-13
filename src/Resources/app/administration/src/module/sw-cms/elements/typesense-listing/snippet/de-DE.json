@@ -1,0 +1,20 @@
+{
+    "sw-cms": {
+        "blocks": {
+            "typesense-listing": {
+                "label": "mbDESIGN Wheel Wizard Listing"
+            }
+        },
+        "elements": {
+            "typesense-listing": {
+                "label": "mbDESIGN Wheel Wizard Listing",
+                "config": {
+                    "label": {
+                        "category": "Produkte aus folgender Kategorie",
+                        "vehicles": "Produkte für folgende Fahrzeuge"
+                    }
+                }
+            }
+        }
+    }
+}

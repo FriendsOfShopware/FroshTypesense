@@ -1,0 +1,14 @@
+{
+    "sw-cms": {
+        "blocks": {
+            "typesense-listing": {
+                "label": "Typesense Listing"
+            }
+        },
+        "elements": {
+            "typesense-listing": {
+                "label": "Typesense Listing"
+            }
+        }
+    }
+}

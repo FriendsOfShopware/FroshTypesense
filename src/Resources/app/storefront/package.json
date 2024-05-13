@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "instantsearch.js": "^4.68.1",
+    "typesense": "^1.8.2",
+    "typesense-instantsearch-adapter": "^2.8.0"
+  },
+  "devDependencies": {
+    "@friendsofshopware/storefront-types": "0.1.8"
+  }
+}

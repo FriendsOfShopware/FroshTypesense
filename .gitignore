@@ -1,0 +1,6 @@
+vendor
+var
+node_modules
+src/Resources/public/administration
+src/Resources/public/static/
+src/Resources/app/storefront/dist
