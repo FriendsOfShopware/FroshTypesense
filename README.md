@@ -33,3 +33,4 @@ cd vendor/frosh/typesense
 docker-compose up -d
 ```
 
+Standard API KEY of the Typesense server is `dev` and can be overwritten.

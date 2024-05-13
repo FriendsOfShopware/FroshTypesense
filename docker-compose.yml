@@ -6,4 +6,4 @@ services:
       - "8108:8108"
     volumes:
       - ./typesense-data:/data
-    command: '--data-dir /data --enable-cors'
+    command: '--data-dir /data --enable-cors --api-key ${TYPESENSE_API_KEY:-dev}'
