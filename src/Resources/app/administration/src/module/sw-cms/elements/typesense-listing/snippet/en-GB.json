@@ -1,14 +1,19 @@
 {
-    "sw-cms": {
-        "blocks": {
-            "typesense-listing": {
-                "label": "Typesense Listing"
-            }
-        },
-        "elements": {
-            "typesense-listing": {
-                "label": "Typesense Listing"
-            }
+  "sw-cms": {
+    "blocks": {
+      "typesense-listing": {
+        "label": "Typesense Listing"
+      }
+    },
+    "elements": {
+      "typesense-listing": {
+        "label": "Typesense Listing",
+        "config": {
+          "filter": {
+            "labelFilterByCategory": "Filter by Category"
+          }
         }
+      }
     }
+  }
 }

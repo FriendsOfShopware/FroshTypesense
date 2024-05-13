@@ -1,3 +1,7 @@
-{% block sw_cms_element_product_listing_config %}
+{% block sw_cms_element_product_listing_config_filter_by_manufacturer %}
     {% parent %}
+    <sw-switch-field
+        v-model:value="filterByCategory"
+        :label="$tc('sw-cms.elements.typesense-listing.config.filter.labelFilterByCategory')"
+    />
 {% endblock %}

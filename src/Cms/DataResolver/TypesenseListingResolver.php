@@ -10,6 +10,7 @@ use Shopware\Core\Content\Cms\DataResolver\CriteriaCollection;
 use Shopware\Core\Content\Cms\DataResolver\Element\AbstractCmsElementResolver;
 use Shopware\Core\Content\Cms\DataResolver\Element\ElementDataCollection;
 use Shopware\Core\Content\Cms\DataResolver\ResolverContext\ResolverContext;
+use Shopware\Core\Framework\Struct\ArrayStruct;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class TypesenseListingResolver extends AbstractCmsElementResolver
@@ -35,10 +36,10 @@ class TypesenseListingResolver extends AbstractCmsElementResolver
 
     public function enrich(CmsSlotEntity $slot, ResolverContext $resolverContext, ElementDataCollection $result): void
     {
-        $slot->getData()?->assign([
+        $slot->setData(new ArrayStruct([
             'nodes' => ClientFactory::getNodes($this->urls),
             'apiKey' => $this->token,
             'indexName' => 'product_' . $resolverContext->getSalesChannelContext()->getLanguageId(),
-        ]);
+        ]));
     }
 }

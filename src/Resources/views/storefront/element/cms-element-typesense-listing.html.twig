@@ -1,8 +1,98 @@
 {% set config = element.fieldConfig.elements %}
-
+{% set filters = config.filters.value|split(',') %}
 {% set typesenseOptions = {
-
+    apiKey: element.data.apiKey,
+    nodes: element.data.nodes,
+    salesChannelId: context.salesChannelId,
+    indexName: element.data.indexName,
+    allowBuyInListing: config('core.listing.allowBuyInListing'),
+    showReview: config('core.listing.showReview'),
+    addToCartRoute: path('frontend.checkout.line-item.add'),
+    boxLayout: config.boxLayout.value,
+    filters: filters,
+    showSorting: config.showSorting.value,
+    defaultSorting: config.defaultSorting.value,
+    useCustomSorting: config.useCustomSorting.value,
+    availableSortings: config.availableSortings.value,
+    locale: app.request.locale,
+    isoCode: context.currency.isoCode,
+    translations: {
+        boxAddProduct: 'listing.boxAddProduct'|trans|sw_sanitize,
+        boxProductDetails: 'listing.boxProductDetails'|trans|sw_sanitize
+    }
 } %}
-<div class="cms-element-{{ element.type }}" data-typesense-listing data-typesense-lising-options="{{ typesenseOptions|json_encode }}">
-    TYPESENSE LISTING
+<div class="cms-element-{{ element.type }}" data-typesense-listing
+     data-typesense-listing-options="{{ typesenseOptions|json_encode }}">
+    <div id="searchbox"></div>
+    <div class="container p-0">
+
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="d-flex flex-column gap-4">
+                    {% if 'category-filter' in  filters %}
+                        <div>
+                            <div class="h6">Browse by Categories</div>
+                            <div id="categories-hierarchical-menu"></div>
+                        </div>
+                    {% endif %}
+
+                    {% if 'manufacturer-filter' in  filters %}
+                        <div>
+                            <div class="h6">Filter by Brands</div>
+                            <div id="brand-list"></div>
+                        </div>
+                    {% endif %}
+
+                    {% if 'shipping-free-filter' in  filters %}
+                        <div id="shipping-free-filter"></div>
+                    {% endif %}
+
+                    {% if 'rating-filter' in  filters %}
+                        <div>
+                            <div class="h6">Filter by Rating</div>
+                            <div id="rating-menu"></div>
+                        </div>
+                    {% endif %}
+
+
+                    {% if 'price-filter' in  filters %}
+                        <div>
+                            <div class="h6">Filter by Price</div>
+                            <div id="price-range-slider"></div>
+                        </div>
+                    {% endif %}
+
+                    <div id="clear-refinements"></div>
+                </div>
+            </div>
+            <div class="col-md">
+
+                <div class="row mt-5 mt-md-0">
+                    <div class="col-md">
+                        <div class="row">
+                            <div class="col-md-4">
+                            </div>
+                            <div class="col-md-8 d-flex justify-content-end align-items-center">
+                                <div id="stats"></div>
+                                <div id="hits-per-page"></div>
+                                <div id="sort-by"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-1">
+                    <div class="col-sm">
+                        <div id="hits"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm">
+                        <div id="pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

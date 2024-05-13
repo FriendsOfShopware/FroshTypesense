@@ -2,16 +2,15 @@
     "sw-cms": {
         "blocks": {
             "typesense-listing": {
-                "label": "mbDESIGN Wheel Wizard Listing"
+                "label": "Typesense Listing"
             }
         },
         "elements": {
             "typesense-listing": {
-                "label": "mbDESIGN Wheel Wizard Listing",
+                "label": "Typesense Listing",
                 "config": {
-                    "label": {
-                        "category": "Produkte aus folgender Kategorie",
-                        "vehicles": "Produkte für folgende Fahrzeuge"
+                    "filter": {
+                        "labelFilterByCategory": "Filter nach Kategorie"
                     }
                 }
             }
