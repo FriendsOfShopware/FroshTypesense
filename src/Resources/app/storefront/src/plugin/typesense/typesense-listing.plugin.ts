@@ -28,7 +28,8 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
         addToCartRoute: null;
         allowBuyInListing: boolean;
         filters: any[];
-        locale: string
+        locale: string,
+        priceField: string,
     };
 
     static options = {
@@ -42,6 +43,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
             boxProductDetails: null,
         },
         filters: [],
+        priceField: 'price',
     }
 
 
@@ -254,7 +256,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
         this.search.addWidgets([
             rangeSlider({
                 container: '#price-range-slider',
-                attribute: 'price',
+                attribute: this.options.priceField,
             }),
         ]);
     }
@@ -289,7 +291,6 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
             imageWidth,
             imageHeight,
             ratingAverage,
-            price,
             isCloseout,
             stock,
             childCount,
@@ -298,13 +299,14 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
 
         const isAvailable = !isCloseout || (stock >= minPurchase);
         const displayBuyButton = isAvailable && childCount <= 0;
+        const price = this.options.priceField;
 
         const formattedPrice = new Intl.NumberFormat(
             this.options.locale, {
                 style: 'currency',
                 currency: this.options.isoCode,
             },
-        ).format(price);
+        ).format(hit[price]);
 
         return `
             <div class="card-body" data-product-information='{"id": "${id}", "name":"${name}"}'>
