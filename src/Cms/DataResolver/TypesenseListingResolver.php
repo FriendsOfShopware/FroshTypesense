@@ -10,6 +10,9 @@ use Shopware\Core\Content\Cms\DataResolver\CriteriaCollection;
 use Shopware\Core\Content\Cms\DataResolver\Element\AbstractCmsElementResolver;
 use Shopware\Core\Content\Cms\DataResolver\Element\ElementDataCollection;
 use Shopware\Core\Content\Cms\DataResolver\ResolverContext\ResolverContext;
+use Shopware\Core\Content\Property\PropertyGroupDefinition;
+use Shopware\Core\Content\Property\PropertyGroupEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -19,9 +22,8 @@ class TypesenseListingResolver extends AbstractCmsElementResolver
         #[Autowire('%frosh_typesense.token%')]
         private readonly string $token,
         #[Autowire('%frosh_typesense.hosts%')]
-        private readonly array $urls)
+        private readonly array  $urls)
     {
-
     }
 
     public function getType(): string
@@ -31,7 +33,15 @@ class TypesenseListingResolver extends AbstractCmsElementResolver
 
     public function collect(CmsSlotEntity $slot, ResolverContext $resolverContext): ?CriteriaCollection
     {
-        return null;
+        $collection = new CriteriaCollection();
+
+        $config = $slot->getConfig();
+
+        if (!empty($config['propertyWhitelist']['value'])) {
+            $collection->add('propertyWhitelist', PropertyGroupDefinition::class, new Criteria($config['propertyWhitelist']['value']));
+        }
+
+        return $collection;
     }
 
     public function enrich(CmsSlotEntity $slot, ResolverContext $resolverContext, ElementDataCollection $result): void
@@ -42,7 +52,21 @@ class TypesenseListingResolver extends AbstractCmsElementResolver
             'nodes' => ClientFactory::getNodes($this->urls),
             'apiKey' => $this->token,
             'indexName' => 'product_' . $context->getLanguageId(),
-            'priceField' => 'price_' . $context->getCurrencyId().'_' . $context->getTaxState(),
+            'priceField' => 'price_' . $context->getCurrencyId() . '_' . $context->getTaxState(),
+            'propertyGroups' => [],
         ]));
+
+        if ($collection = $result->get('propertyWhitelist')) {
+            $collection->getEntities()->sortByPositions();
+
+            $slot->getData()?->set('propertyGroups', $collection->getEntities()->fmap(function (PropertyGroupEntity $group) {
+                return [
+                    'id' => $group->getId(),
+                    'name' => $group->getTranslation('name'),
+                    'displayType' => $group->getDisplayType(),
+                    'sortingType' => $group->getSortingType(),
+                ];
+            }));
+        }
     }
 }

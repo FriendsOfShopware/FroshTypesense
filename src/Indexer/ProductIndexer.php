@@ -4,7 +4,6 @@ namespace FroshTypesense\Indexer;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Doctrine\FetchModeHelper;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -72,6 +71,11 @@ class ProductIndexer extends AbstractIndexer
                     'facet' => true
                 ],
                 [
+                    'name' => 'property_.*',
+                    'type' => 'string[]',
+                    'facet' => true
+                ],
+                [
                     'name' => 'ratingAverage',
                     'type' => 'float',
                     'facet' => true
@@ -114,6 +118,20 @@ class ProductIndexer extends AbstractIndexer
     public function fetch(array $ids, Context $context): array
     {
         $products = $this->fetchProducts($ids, $context);
+
+        $propertyIds = [];
+
+        foreach ($products as &$product) {
+            $values = json_decode($product['propertyIds'], true, 512, \JSON_THROW_ON_ERROR);
+            $propertyIds = array_merge($propertyIds, $values);
+
+            $product['propertyIds'] = $values;
+        }
+        unset($product);
+
+        $propertyIds = array_unique($propertyIds);
+
+        $propertyValues = $this->fetchPropertyValues($propertyIds, $context);
 
         $data = [];
         foreach ($products as $id => $product) {
@@ -180,6 +198,18 @@ class ProductIndexer extends AbstractIndexer
                 'childCount' => (int) $product['childCount'],
                 'url' => '/'. $paths[0] ?? '',
             ];
+
+            foreach ($product['propertyIds'] as $propertyId) {
+                $propertyValue = $propertyValues[$propertyId] ?? null;
+
+                if ($propertyValue === null) {
+                    continue;
+                }
+
+                $row['property_' . $propertyValue['property_group_id']] = [
+                    $this->takeItem('name', $context, $propertyValue['translation'])
+                ];
+            }
 
             foreach ($prices as $price) {
                 $row['price_' . $price['currencyId'] . '_gross'] = $price['gross'];
@@ -400,5 +430,49 @@ SQL;
         }
 
         return $filtered;
+    }
+
+    private function fetchPropertyValues(array $propertyIds, Context $context): array
+    {
+        $sql = <<<'SQL'
+SELECT
+    LOWER(HEX(property_group_option.id)) as id,
+    LOWER(HEX(property_group_option.property_group_id)) as property_group_id,
+    CONCAT(
+        "[",
+        GROUP_CONCAT(
+            DISTINCT
+            JSON_OBJECT(
+                'languageId', LOWER(HEX(property_group_option_translation.language_id)),
+                'name', property_group_option_translation.name
+            )
+        ),
+        "]"
+    ) as translation
+
+FROM property_group_option
+LEFT JOIN property_group_option_translation ON (property_group_option.id = property_group_option_translation.property_group_option_id AND property_group_option_translation.language_id IN (:languageIds))
+WHERE id IN (:ids)
+GROUP BY property_group_option.id
+SQL;
+
+        $data = $this->connection->fetchAllAssociative(
+            $sql,
+            [
+                'ids' => Uuid::fromHexToBytesList($propertyIds),
+                'languageIds' => Uuid::fromHexToBytesList($context->getLanguageIdChain()),
+            ],
+            [
+                'ids' => ArrayParameterType::BINARY,
+                'languageIds' => ArrayParameterType::BINARY,
+            ]
+        );
+
+        return array_map(function ($item) {
+            return [
+                'property_group_id' => $item['property_group_id'],
+                'translation' => $this->filterToOne(json_decode($item['translation'], true, 512, \JSON_THROW_ON_ERROR)),
+            ];
+        }, FetchModeHelper::groupUnique($data));
     }
 }
