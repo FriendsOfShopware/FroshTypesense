@@ -7,5 +7,9 @@
     <services>
         <defaults autowire="true" autoconfigure="true" />
         <prototype namespace="FroshTypesense\" resource="../../" exclude="../../{FroshTypesense.php}" />
+
+        <service id="Typesense\Client">
+            <factory class="FroshTypesense\DependencyInjection\ClientFactory" method="create"/>
+        </service>
     </services>
 </container>
