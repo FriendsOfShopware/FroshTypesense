@@ -5,10 +5,8 @@ namespace FroshTypesense\Indexer;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IteratorFactory;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Typesense\Client;
 
 #[AsMessageHandler(handles: TypesenseIndexingMessage::class)]
@@ -40,6 +38,8 @@ class TypesenseIndexingMessageHandler
             }
 
             $data = $indexer->fetch($message->ids, $context);
+
+            $this->client->collections[$message->indexName]->documents->delete(['filter_by' => 'id:=' . implode(',', $message->ids)]);
 
             $results = $this->client->collections[$message->indexName]->documents->import($data, ['action' => 'upsert']);
 

@@ -112,7 +112,12 @@ class ProductIndexer extends AbstractIndexer
                 [
                     'name' => 'childCount',
                     'type' => 'int32',
-                ]
+                ],
+                [
+                    'name' => 'categoryTree',
+                    'type' => 'string[]',
+                    'facet' => true
+                ],
             ]
         ];
 
@@ -210,6 +215,7 @@ class ProductIndexer extends AbstractIndexer
                 'imageSrcSet' => $coverSrcSet,
                 'imageWidth' => $coverWidth,
                 'imageHeight' => $coverHeight,
+                'categoryTree' => json_decode($product['categoryTree'], true, 512, \JSON_THROW_ON_ERROR),
                 'childCount' => (int) $product['childCount'],
                 'url' => '/'. $paths[0] ?? '',
             ];
