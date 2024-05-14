@@ -139,6 +139,10 @@ class ProductIndexer extends AbstractIndexer
         $propertyIds = [];
 
         foreach ($products as &$product) {
+            if ($product['propertyIds'] === null) {
+                continue;
+            }
+
             $values = json_decode($product['propertyIds'], true, 512, \JSON_THROW_ON_ERROR);
             $propertyIds[] = $values;
 
@@ -155,7 +159,7 @@ class ProductIndexer extends AbstractIndexer
 
         $data = [];
         foreach ($products as $id => $product) {
-            if ($product['displayGroup'] === null) {
+            if ($product['displayGroup'] === null || $product['propertyIds'] === null) {
                 continue;
             }
 
