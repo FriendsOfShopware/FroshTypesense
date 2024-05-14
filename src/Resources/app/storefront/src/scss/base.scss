@@ -1,8 +1,20 @@
+.cms-block-typesense-listing {
+    overflow: initial;
+}
+
 .cms-element-typesense-listing {
     .ais-Hits-list {
         @extend .d-grid;
         @extend .gap-3;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: 1fr;
+
+        @include media-breakpoint-up(md) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @include media-breakpoint-up(xl) {
+            grid-template-columns: repeat(3, 1fr);
+        }
     }
 }
 

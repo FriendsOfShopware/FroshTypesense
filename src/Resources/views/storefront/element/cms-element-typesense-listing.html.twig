@@ -1,11 +1,13 @@
 {% set config = element.fieldConfig.elements %}
 {% set filters = config.filters.value|split(',') %}
+
 {% set typesenseOptions = {
     apiKey: element.data.apiKey,
     nodes: element.data.nodes,
     salesChannelId: context.salesChannelId,
     indexName: element.data.indexName,
     priceField: element.data.priceField,
+    propertyGroups: element.data.propertyGroups,
     allowBuyInListing: config('core.listing.allowBuyInListing'),
     showReview: config('core.listing.showReview'),
     addToCartRoute: path('frontend.checkout.line-item.add'),
@@ -25,8 +27,8 @@
 <div class="cms-element-{{ element.type }}" data-typesense-listing
      data-typesense-listing-options="{{ typesenseOptions|json_encode }}">
     <div id="searchbox"></div>
-    <div class="container p-0">
 
+    <div class="container p-0">
         <div class="row mt-4">
             <div class="col-md-3">
                 <div class="d-flex flex-column gap-4">
@@ -36,6 +38,10 @@
                             <div id="categories-hierarchical-menu"></div>
                         </div>
                     {% endif %}
+
+                    {% for propertyGroup in element.data.propertyGroups  %}
+                        <div id="property-group-{{ propertyGroup.id }}"></div>
+                    {% endfor %}
 
                     {% if 'manufacturer-filter' in  filters %}
                         <div>
@@ -55,7 +61,6 @@
                         </div>
                     {% endif %}
 
-
                     {% if 'price-filter' in  filters %}
                         <div>
                             <div class="h6">Filter by Price</div>
@@ -66,10 +71,9 @@
                     <div id="clear-refinements"></div>
                 </div>
             </div>
-            <div class="col-md">
-
+            <div class="col-md-9">
                 <div class="row mt-5 mt-md-0">
-                    <div class="col-md">
+                    <div class="col">
                         <div class="row">
                             <div class="col-md-4">
                             </div>
@@ -83,13 +87,13 @@
                 </div>
 
                 <div class="row mt-1">
-                    <div class="col-sm">
+                    <div class="col">
                         <div id="hits"></div>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-sm">
+                    <div class="col">
                         <div id="pagination"></div>
                     </div>
                 </div>

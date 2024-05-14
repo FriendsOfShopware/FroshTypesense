@@ -1,4 +1,4 @@
-import instantsearch from 'instantsearch.js/es';
+import instantsearch, {Expand, UiState} from 'instantsearch.js/es';
 import {highlight} from 'instantsearch.js/es/helpers';
 import {
     searchBox,
@@ -28,6 +28,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
         addToCartRoute: null;
         allowBuyInListing: boolean;
         filters: any[];
+        propertyGroups: any[];
         locale: string,
         priceField: string,
     };
@@ -43,6 +44,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
             boxProductDetails: null,
         },
         filters: [],
+        propertyGroups: [],
         priceField: 'price',
     }
 
@@ -68,7 +70,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
                     prefix: true,
                     group_by: 'displayGroup',
                     filter_by: `salesChannelIds:[${salesChannelId}]`,
-                },
+                }
             }
         );
 
@@ -161,6 +163,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
         this.ratingFilter();
         this.priceFilter();
         this.shippingFreeFilter();
+        this.propertyGroupsFilter();
 
         this.search.on('render', () => {
             window.PluginManager.initializePlugins();
@@ -189,7 +192,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
                     showMore: 'btn btn-secondary btn-sm',
                     list: 'list-unstyled',
                     childList: 'ms-4',
-                    count: 'badge text-dark-2 ms-2',
+                    count: 'badge text-bg-dark ms-2',
                     link: 'text-dark text-decoration-none',
                     selectedItem: 'text-primary fw-bold',
                     parentItem: 'text-dark fw-bold',
@@ -219,7 +222,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
                     searchableReset: 'd-none',
                     showMore: 'btn btn-light',
                     list: 'list-unstyled',
-                    count: 'badge text-dark-2 ms-2',
+                    count: 'badge text-bg-dark ms-2',
                     label: 'd-flex align-items-center',
                     checkbox: 'me-2',
                 },
@@ -240,7 +243,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
                     list: 'list-unstyled',
                     link: 'text-decoration-none',
                     starIcon: '',
-                    count: 'badge text-dark-2 ms-2',
+                    count: 'badge text-bg-dark ms-2',
                     disabledItem: 'text-muted',
                     selectedItem: 'fw-bold text-primary',
                 },
@@ -279,6 +282,33 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
                 },
             }),
         ]);
+    }
+
+    propertyGroupsFilter() {
+        Object.values(this.options.propertyGroups).map((group) => {
+            this.search.addWidgets([
+                refinementList({
+                    limit: 10,
+                    showMoreLimit: 50,
+                    container: `#property-group-${group.id}`,
+                    attribute: 'property_' + group.id,
+                    searchable: true,
+                    searchablePlaceholder: `Search ${group.name}`,
+                    showMore: true,
+                    sortBy: ['name:asc'],
+                    cssClasses: {
+                        searchableInput: 'form-control form-control-sm mb-2',
+                        searchableSubmit: 'd-none',
+                        searchableReset: 'd-none',
+                        showMore: 'btn btn-light',
+                        list: 'list-unstyled',
+                        count: 'badge text-bg-dark ms-2',
+                        label: 'd-flex align-items-center',
+                        checkbox: 'me-2',
+                    },
+                })
+            ]);
+        });
     }
 
     itemTemplate(hit: Hit) {
