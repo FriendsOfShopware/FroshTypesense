@@ -55,6 +55,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
         const {
             indexName,
             salesChannelId,
+            categoryId,
             apiKey,
             nodes,
             boxLayout,
@@ -71,7 +72,7 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
                     queryBy: 'name,description',
                     prefix: true,
                     group_by: 'displayGroup',
-                    filter_by: `salesChannelIds:[${salesChannelId}]`,
+                    filter_by: `salesChannelIds:[${salesChannelId}] categoryTree:[${categoryId}]`,
                 }
             }
         );
