@@ -8,6 +8,7 @@ import {
     stats,
     sortBy,
     hierarchicalMenu,
+    panel,
     rangeSlider,
     toggleRefinement,
     hitsPerPage,
@@ -17,6 +18,7 @@ import {
 import TypesenseInstantSearchAdapter from 'typesense-instantsearch-adapter';
 import {InstantSearch} from "instantsearch.js";
 import type {Hit} from "instantsearch.js/es/types";
+import { collapseButtonText } from './templates';
 
 export default class TypesenseListingPlugin extends window.PluginBaseClass {
 
@@ -170,6 +172,9 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
         });
 
         this.search.start();
+
+
+
     }
 
     categoryFilter() {
@@ -206,28 +211,41 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
             return;
         }
 
-        this.search.addWidgets([
-            refinementList({
-                limit: 10,
-                showMoreLimit: 50,
-                container: '#brand-list',
-                attribute: 'manufacturerName',
-                searchable: true,
-                searchablePlaceholder: 'Search brands',
-                showMore: true,
-                sortBy: ['name:asc', 'count:desc'],
-                cssClasses: {
-                    searchableInput: 'form-control form-control-sm mb-2',
-                    searchableSubmit: 'd-none',
-                    searchableReset: 'd-none',
-                    showMore: 'btn btn-light',
-                    list: 'list-unstyled',
-                    count: 'badge text-bg-dark ms-2',
-                    label: 'd-flex align-items-center',
-                    checkbox: 'me-2',
+        const list = panel<typeof refinementList>({
+            templates: {
+                header() {
+                    return 'Manufacturer';
                 },
-            })
-        ]);
+                collapseButtonText,
+            },
+            collapsed: () => false,
+        })(refinementList);
+
+        const widget = list({
+            container: '#manufacturer-list',
+            attribute: 'manufacturerName',
+            searchable: true,
+            searchablePlaceholder: 'Search for manufacturer…',
+            showMore: true,
+            limit: 10,
+            showMoreLimit: 50,
+            sortBy: ['name:asc', 'count:desc'],
+            cssClasses: {
+                searchableInput: 'form-control form-control-sm mb-2',
+                searchableSubmit: 'd-none',
+                searchableReset: 'd-none',
+                showMore: 'btn btn-light',
+                list: 'list-unstyled',
+                count: 'badge text-bg-dark ms-2',
+                label: 'd-flex align-items-center',
+                checkbox: 'me-2',
+            },
+            templates: {
+                searchableSubmit: (_, { html }) => html`${this.searchableSubmitTemplate()}`,
+            },
+        });
+
+        this.search.addWidgets([widget]);
     }
 
     ratingFilter() {
@@ -286,28 +304,41 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
 
     propertyGroupsFilter() {
         Object.values(this.options.propertyGroups).map((group) => {
-            this.search.addWidgets([
-                refinementList({
-                    limit: 10,
-                    showMoreLimit: 50,
-                    container: `#property-group-${group.id}`,
-                    attribute: 'property_' + group.id,
-                    searchable: true,
-                    searchablePlaceholder: `Search ${group.name}`,
-                    showMore: true,
-                    sortBy: ['name:asc'],
-                    cssClasses: {
-                        searchableInput: 'form-control form-control-sm mb-2',
-                        searchableSubmit: 'd-none',
-                        searchableReset: 'd-none',
-                        showMore: 'btn btn-light',
-                        list: 'list-unstyled',
-                        count: 'badge text-bg-dark ms-2',
-                        label: 'd-flex align-items-center',
-                        checkbox: 'me-2',
+            const list = panel<typeof refinementList>({
+                templates: {
+                    header() {
+                        return group.name;
                     },
-                })
-            ]);
+                    collapseButtonText,
+                },
+                collapsed: () => false,
+            })(refinementList);
+
+            const widget = list({
+                limit: 10,
+                showMoreLimit: 50,
+                container: `#property-group-${group.id}`,
+                attribute: 'property_' + group.id,
+                searchable: true,
+                searchablePlaceholder: `Search ${group.name}`,
+                showMore: true,
+                sortBy: ['name:asc'],
+                cssClasses: {
+                    searchableInput: 'form-control form-control-sm mb-2',
+                    searchableSubmit: 'd-none',
+                    searchableReset: 'd-none',
+                    showMore: 'btn btn-light',
+                    list: 'list-unstyled',
+                    count: 'badge text-bg-dark ms-2',
+                    label: 'd-flex align-items-center',
+                    checkbox: 'me-2',
+                },
+                templates: {
+                    searchableSubmit: (_, { html }) => html`${this.searchableSubmitTemplate()}`,
+                },
+            });
+
+            this.search.addWidgets([widget]);
         });
     }
 
@@ -393,5 +424,16 @@ export default class TypesenseListingPlugin extends window.PluginBaseClass {
                 </div>
             </div>
       `;
+    }
+
+    searchableSubmitTemplate() {
+        return `
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 14 14">
+                <g fill="none" fill-rule="evenodd" stroke="#21243D" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33" transform="translate(1 1)">
+                    <circle cx="5.333" cy="5.333" r="5.333" />
+                    <path d="M12 12L9.1 9.1" />
+                </g>
+            </svg>
+        `;
     }
 }

@@ -111,3 +111,21 @@
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
 }
+
+
+// Facet
+.ais-Panel--collapsed .ais-Panel-body,
+.ais-Panel--collapsed .ais-Panel-footer {
+    display: none;
+}
+
+.ais-Panel-collapseButton {
+    @extend .btn;
+    @extend .btn-link;
+}
+
+.ais-Panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

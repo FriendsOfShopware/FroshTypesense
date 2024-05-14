@@ -33,21 +33,15 @@
             <div class="col-md-3">
                 <div class="d-flex flex-column gap-4">
                     {% if 'category-filter' in  filters %}
-                        <div>
-                            <div class="h6">Browse by Categories</div>
-                            <div id="categories-hierarchical-menu"></div>
-                        </div>
+                        <div id="categories-hierarchical-menu"></div>
                     {% endif %}
 
-                    {% for propertyGroup in element.data.propertyGroups  %}
+                    {% for propertyGroup in element.data.propertyGroups %}
                         <div id="property-group-{{ propertyGroup.id }}"></div>
                     {% endfor %}
 
                     {% if 'manufacturer-filter' in  filters %}
-                        <div>
-                            <div class="h6">Filter by Brands</div>
-                            <div id="brand-list"></div>
-                        </div>
+                        <div id="manufacturer-list"></div>
                     {% endif %}
 
                     {% if 'shipping-free-filter' in  filters %}
@@ -55,17 +49,11 @@
                     {% endif %}
 
                     {% if 'rating-filter' in  filters %}
-                        <div>
-                            <div class="h6">Filter by Rating</div>
-                            <div id="rating-menu"></div>
-                        </div>
+                        <div id="rating-menu"></div>
                     {% endif %}
 
                     {% if 'price-filter' in  filters %}
-                        <div>
-                            <div class="h6">Filter by Price</div>
-                            <div id="price-range-slider"></div>
-                        </div>
+                        <div id="price-range-slider"></div>
                     {% endif %}
 
                     <div id="clear-refinements"></div>
