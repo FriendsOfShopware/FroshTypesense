@@ -12,6 +12,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class ProductIndexer extends AbstractIndexer
 {
+    private array $propertyGroupIds;
+
     public function __construct(
         private readonly Connection $connection,
         #[Autowire(service: 'shopware.asset.public')]
@@ -27,7 +29,7 @@ class ProductIndexer extends AbstractIndexer
 
     public function getMapping(): array
     {
-        return [
+        $result = [
             'fields' => [
                 [
                     'name' => 'name',
@@ -113,6 +115,16 @@ class ProductIndexer extends AbstractIndexer
                 ]
             ]
         ];
+
+        foreach ($this->getPropertyGroupIds() as $propertyGroupId) {
+            $result['fields'][] = [
+                'name' => 'property_' . $propertyGroupId,
+                'type' => 'string[]',
+                'facet' => true,
+            ];
+        }
+
+        return $result;
     }
 
     public function fetch(array $ids, Context $context): array
@@ -123,11 +135,14 @@ class ProductIndexer extends AbstractIndexer
 
         foreach ($products as &$product) {
             $values = json_decode($product['propertyIds'], true, 512, \JSON_THROW_ON_ERROR);
-            $propertyIds = array_merge($propertyIds, $values);
+            $propertyIds[] = $values;
 
             $product['propertyIds'] = $values;
         }
+
         unset($product);
+
+        $propertyIds = array_merge(...$propertyIds);
 
         $propertyIds = array_unique($propertyIds);
 
@@ -198,6 +213,10 @@ class ProductIndexer extends AbstractIndexer
                 'childCount' => (int) $product['childCount'],
                 'url' => '/'. $paths[0] ?? '',
             ];
+
+            foreach ($this->getPropertyGroupIds() as $propertyGroupId) {
+                $row['property_' . $propertyGroupId] = [];
+            }
 
             foreach ($product['propertyIds'] as $propertyId) {
                 $propertyValue = $propertyValues[$propertyId] ?? null;
@@ -474,5 +493,22 @@ SQL;
                 'translation' => $this->filterToOne(json_decode($item['translation'], true, 512, \JSON_THROW_ON_ERROR)),
             ];
         }, FetchModeHelper::groupUnique($data));
+    }
+
+    private function getPropertyGroupIds(): array
+    {
+        if (isset($this->propertyGroupIds)) {
+            return $this->propertyGroupIds;
+        }
+
+        $sql = <<<'SQL'
+SELECT
+    LOWER(HEX(id)) as id
+FROM property_group
+SQL;
+
+        $data = $this->connection->fetchAllAssociative($sql);
+
+        return $this->propertyGroupIds = array_column($data, 'id');
     }
 }

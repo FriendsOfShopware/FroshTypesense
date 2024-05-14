@@ -4,7 +4,6 @@ namespace FroshTypesense\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 class TypesenseExtension extends Extension
 {
@@ -12,8 +11,8 @@ class TypesenseExtension extends Extension
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
-        $container->setParameter('frosh_typesense.token', $config['token']);
-        $container->setParameter('frosh_typesense.hosts', $config['hosts']);
+        $container->setParameter('frosh_typesense.token', $config['token'] ?? '');
+        $container->setParameter('frosh_typesense.hosts', $config['hosts'] ?? []);
     }
 
     public function getConfiguration(array $config, ContainerBuilder $container)
